@@ -32,7 +32,7 @@ def enter_data():
             print("------------------------------------------")
             print("Base Director: ", BASE_DIR)
             
-            filepath = os.path.join(BASE_DIR, 'Tkinter/ExcelData', 'data.xlsx')
+            filepath = os.path.join(BASE_DIR, '1. BasicForm + Excel/ExcelData', 'data.xlsx')
 
             
             if not os.path.exists(filepath):

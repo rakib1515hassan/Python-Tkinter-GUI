@@ -1,8 +1,7 @@
 import tkinter
 from tkinter import ttk
 from tkinter import messagebox
-import os
-import openpyxl
+import sqlite3
 
 from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -30,37 +29,56 @@ def enter_data():
             print("# Courses: ", numcourses, "# Semesters: ", numsemesters)
             print("Registration status", registration_status)
             print("------------------------------------------")
-            # print("Base Director: ", BASE_DIR)
             
-            filepath = os.path.join(BASE_DIR, '1. BasicForm + Excel/ExcelData', 'data.xlsx')
+            ##? Create a Dataabase
+            db_dir = BASE_DIR / '2. BasicForm + SQLit3/Database'
+            db_dir.mkdir(parents=True, exist_ok=True)
+            db_path = db_dir / 'data.db'
 
+            conn = sqlite3.connect(db_path)
+
+            ##? Create Table
+            table_create_query = """
+                CREATE TABLE IF NOT EXISTS Student_Data (
+                    firstname TEXT, 
+                    lastname TEXT, 
+                    title TEXT, 
+                    age INT, 
+                    nationality TEXT, 
+                    registration_status TEXT, 
+                    num_courses INT, 
+                    num_semesters INT
+                )
+            """
+            conn.execute(table_create_query)
             
-            if not os.path.exists(filepath):
-                workbook = openpyxl.Workbook()
-                sheet = workbook.active
-                heading = ["First Name", "Last Name", "Title", "Age", "Nationality", "# Courses", "# Semesters", "Registration status"]
-                sheet.append(heading)
-                workbook.save(filepath)
-
-            workbook = openpyxl.load_workbook(filepath)
-            sheet = workbook.active
-            sheet.append([
+            # Insert Data
+            data_insert_query = """
+                INSERT INTO Student_Data (
                     firstname, 
                     lastname, 
                     title, 
                     age, 
                     nationality, 
-                    numcourses,
-                    numsemesters, 
-                    registration_status
-                ])
-            workbook.save(filepath)
+                    registration_status, 
+                    num_courses, 
+                    num_semesters
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+
+            """
+            data_insert_tuple = (firstname, lastname, title,
+                                  age, nationality, registration_status, numcourses, numsemesters)
+            cursor = conn.cursor()
+            cursor.execute(data_insert_query, data_insert_tuple)
+            conn.commit()
+            conn.close()
+
+            
                 
         else:
             tkinter.messagebox.showwarning(title="Error", message="First name and last name are required.")
     else:
         tkinter.messagebox.showwarning(title= "Error", message="You have not accepted the terms")
-
 
 
 ##! My Tkinter Code
@@ -106,7 +124,6 @@ for widget in user_info_frame.winfo_children():
 
 
 
-
 ##? Saving Course Info
 courses_frame = tkinter.LabelFrame(frame)
 courses_frame.grid(row=1, column=0, sticky="news", padx=20, pady=10)
@@ -135,7 +152,6 @@ for widget in courses_frame.winfo_children():
 
 
 
-
 ##? Accept terms
 terms_frame = tkinter.LabelFrame(frame, text="Terms & Conditions")
 terms_frame.grid(row=2, column=0, sticky="news", padx=20, pady=10)
@@ -144,6 +160,7 @@ accept_var = tkinter.StringVar(value="Not Accepted")
 terms_check = tkinter.Checkbutton(terms_frame, text= "I accept the terms and conditions.",
                                   variable=accept_var, onvalue="Accepted", offvalue="Not Accepted")
 terms_check.grid(row=0, column=0)
+
 
 
 ##? Button (Submit Button)

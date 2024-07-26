@@ -1,0 +1,13 @@
+4.StudentManagement/
+├── config.py
+├── assets/
+│   └── img/
+│       └── bg.jpg
+│
+├── auth/
+│   ├── login.py
+│   ├── registration.py
+│   ├── forgetpassword.py
+│   └── utils.py
+│
+└── main.py

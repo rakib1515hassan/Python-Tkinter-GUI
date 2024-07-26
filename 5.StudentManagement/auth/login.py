@@ -1,7 +1,7 @@
 from tkinter import *
 from PIL import ImageTk
 from config import image_path
-from auth.utils import on_enter, on_leave
+from auth.utils import on_enter, on_leave, toggle_password_visibility, mask_password
 
 def show_login_window():
     # Create the login window
@@ -39,12 +39,9 @@ def show_login_window():
     )
     usernameEntry.place(x=580, y=200)
     usernameEntry.insert(0, 'Username')  # 0 is the position of this `Username` text
-    # usernameEntry.bind('<FocusIn>', lambda event: on_enter(event, usernameEntry, 'Username'))
-
     usernameEntry.bind('<FocusIn>', lambda event: on_enter(event, usernameEntry, 'Username'))
     usernameEntry.bind('<FocusOut>', lambda event: on_leave(event, usernameEntry, 'Username'))
     
-
     frame1 = Frame(
         login_window,
         width=250,
@@ -61,16 +58,16 @@ def show_login_window():
         width=25, 
         font=('Microsoft Yahei UI Light', 11, 'bold'),
         bd=0,  # Border Remove
-        fg='firebrick1'
+        fg='firebrick1',
+        # show='*'
+        # show=''
     )
     passwordEntry.place(x=580, y=260)
     passwordEntry.insert(0, 'Password')  # 0 is the position of this `Password` text
-    # passwordEntry.bind('<FocusIn>', lambda event: on_enter(event, passwordEntry, 'Password'))
-
     passwordEntry.bind('<FocusIn>', lambda event: on_enter(event, passwordEntry, 'Password'))
     passwordEntry.bind('<FocusOut>', lambda event: on_leave(event, passwordEntry, 'Password'))
+    passwordEntry.bind('<KeyRelease>', lambda event: mask_password(event, passwordEntry, 'Password'))
     
-
     frame2 = Frame(
         login_window,
         width=250,
@@ -79,7 +76,22 @@ def show_login_window():
     )
     frame2.place(x=580, y=284)
 
+    # Load images for the eye button
+    closeEyeImage = PhotoImage(file=(image_path+'/closeye.png'))
+    openEyeImage = PhotoImage(file=(image_path+'/openeye.png'))
+
+    eyeButton = Button(
+        login_window,
+        image=closeEyeImage,
+        bd=0,
+        bg='white',
+        activebackground='white',
+        command=lambda: toggle_password_visibility(passwordEntry, eyeButton, openEyeImage, closeEyeImage, 'Password')
+    )
+    eyeButton.place(x=800, y=257)
 
 
 
     login_window.mainloop()
+
+# show_login_window()
